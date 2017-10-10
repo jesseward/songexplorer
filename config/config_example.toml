@@ -1,0 +1,11 @@
+HTTPBindPort = 64738
+HTTPBindHost = "localhost"
+LastFMAPIKey = "..."
+LastFMSharedSecret = "..."
+RedisHost = "localhost"
+RedisPort = 6379
+RedisKeyExpiry = "30d"
+LogFileLocation = "/tmp/songexplorer.log"
+MaxTopSimArtists = 10
+MaxTopSimTracks = 10
+MaxTopArtistTracks = 10
