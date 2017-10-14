@@ -43,9 +43,9 @@ func (a *App) TrackSimilar(ctx context.Context, req *apiai.Request) (*apiai.Resp
 			s = fmt.Sprintf("unable to fetch similar tracks for %s by %s", track, artist)
 		} else {
 			s = strings.Join(similar.SimilarTracks, ".")
-			_, err := a.Cache.Set(similarKey, s, a.Config.RedisKeyExpiry)
+			_, err := a.Cache.Set(similarKey, s, a.Config.CacheTTLDuration)
 			if err != nil {
-				log.Printf(":: ERROR :: TrackSimilar :: unable to set key %s", similarKey)
+				log.Printf(":: ERROR :: TrackSimilar :: %v", err)
 			}
 		}
 
@@ -77,9 +77,9 @@ func (a *App) ArtistSimilar(ctx context.Context, req *apiai.Request) (*apiai.Res
 			s = fmt.Sprintf("unable to find similar artists for %s", artist)
 		} else {
 			s = strings.Join(similar.SimilarArtist, ",")
-			_, err := a.Cache.Set(artistKey, s, a.Config.RedisKeyExpiry)
+			_, err := a.Cache.Set(artistKey, s, a.Config.CacheTTLDuration)
 			if err != nil {
-				log.Printf(":: ERROR :: ArtistSimilar :: unable to write key to cache key=%s, error=%v", artistKey, err)
+				log.Printf(":: ERROR :: ArtistSimilar :: %v", err)
 			}
 		}
 	}
@@ -108,9 +108,9 @@ func (a *App) ArtistTopTracks(ctx context.Context, req *apiai.Request) (*apiai.R
 			s = fmt.Sprintf("unable to locate top tracks for artist %s", artist)
 		} else {
 			s = strings.Join(tracks.Tracks, ",")
-			_, err := a.Cache.Set(artistKey, s, a.Config.RedisKeyExpiry)
+			_, err := a.Cache.Set(artistKey, s, a.Config.CacheTTLDuration)
 			if err != nil {
-				log.Printf(":: ERROR :: ArtistTopTracks :: unable to write key to cache key=%s, error=%v", artistKey, err)
+				log.Printf(":: ERROR :: ArtistTopTracks :: %v", err)
 			}
 		}
 	}
@@ -140,9 +140,9 @@ func (a *App) ArtistBio(ctx context.Context, req *apiai.Request) (*apiai.Respons
 			s = fmt.Sprintf("unable to locate biography for %s", artist)
 		} else {
 			s = bio.Bio
-			_, err := a.Cache.Set(artistKey, s, a.Config.RedisKeyExpiry)
+			_, err := a.Cache.Set(artistKey, s, a.Config.CacheTTLDuration)
 			if err != nil {
-				log.Printf(":: ERROR :: ArtistBio :: unable to set key=%s, err=%v", artistKey, err)
+				log.Printf(":: ERROR :: ArtistBio :: %v", err)
 			}
 		}
 	}

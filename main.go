@@ -35,7 +35,7 @@ func main() {
 		Compress:   true, // disabled by default
 	})
 
-	// abort if we're unable to create a new source API client
+	// abort boot if we're unable to create a new source API client
 	src, err := lastfm.New(cfg)
 	if err != nil {
 		log.Fatalf("unable to create metadata client, %v", err)

@@ -13,31 +13,28 @@ type Redis struct {
 	expiry time.Duration
 }
 
+// Get fetches and returns a (string) value from the store.
 func (c *Redis) Get(k string) (string, error) {
-
 	v, err := c.cli.Get(k).Result()
-
 	if err != nil {
 		return "", err
 	}
 	return v, nil
 }
 
-func (c *Redis) Set(k, v, x string) (bool, error) {
-	expiry, err := time.ParseDuration(x)
+// Set writes a key->value to the key store.
+func (c *Redis) Set(k, v string, x time.Duration) (bool, error) {
+	err := c.cli.Set(k, v, x).Err()
 	if err != nil {
-		expiry = 0
-	}
-	err = c.cli.Set(k, v, expiry).Err()
-	if err != nil {
-		return false, fmt.Errorf("unable to set key: %s, value: %v, error: %v", k, v, err)
+		return false, fmt.Errorf("unable to set key: %s, error: %v", k, err)
 	}
 	return true, nil
 }
 
+// New returns a Redis (Cache interface) object.
 func New(cfg *config.Config) *Redis {
-	r := redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", cfg.RedisHost, cfg.RedisPort)})
-	x, err := time.ParseDuration(cfg.RedisKeyExpiry)
+	r := redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", cfg.CacheHost, cfg.CachePort)})
+	x, err := time.ParseDuration(cfg.CacheTTL)
 
 	if err != nil {
 		x = 0

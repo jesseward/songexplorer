@@ -61,6 +61,6 @@ func (c *LastFM) GetArtistBio(artist string) (*sources.CachableBio, error) {
 
 // New returns a LASTFM API client
 func New(config *config.Config) (*LastFM, error) {
-	api := lfm.New(config.LastFMAPIKey, config.LastFMSharedSecret)
+	api := lfm.New(config.SourceAPIKey, config.SourceSharedSecret)
 	return &LastFM{config, api}, nil
 }
