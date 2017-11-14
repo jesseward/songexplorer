@@ -6,6 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"sync"
+
+	"github.com/jesseward/songexplorer/metrics"
 
 	"github.com/campoy/apiai"
 
@@ -44,18 +47,34 @@ func main() {
 	// create our cache client
 	cache := redis.New(cfg)
 
-	app := app.App{
-		Source: src,
-		Cache:  cache,
-		Config: cfg,
+	m, mux := metrics.NewAdminServletMetrics()
+
+	a := app.App{
+		Source:  src,
+		Cache:   cache,
+		Config:  cfg,
+		Metrics: m,
 	}
 
 	h := apiai.NewHandler()
-	h.Register("artist-recommendation", app.ArtistSimilar)
-	h.Register("artist-bio", app.ArtistBio)
-	h.Register("artist-top-tracks", app.ArtistTopTracks)
-	h.Register("song-recomendations", app.TrackSimilar)
+	h.Register("artist-recommendation", a.ArtistSimilar)
+	h.Register("artist-bio", a.ArtistBio)
+	h.Register("artist-top-tracks", a.ArtistTopTracks)
+	h.Register("song-recomendations", a.TrackSimilar)
 
-	log.Printf("INFO :: main :: starting http service on %s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort)
-	log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort), h))
+	wg := sync.WaitGroup{}
+	wg.Add(1)
+	go func() {
+		log.Printf("INFO :: main :: starting metrics service on %s:%d", cfg.HTTPDebugBindAddres, cfg.HTTPDebugPort)
+		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.HTTPDebugBindAddres, cfg.HTTPDebugPort), mux))
+		wg.Done()
+	}()
+
+	wg.Add(1)
+	go func() {
+		log.Printf("INFO :: main :: starting songexplorer service on %s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort)
+		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort), h))
+		wg.Done()
+	}()
+	wg.Wait()
 }

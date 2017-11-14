@@ -1,5 +1,7 @@
 HTTPBindPort = 64738
 HTTPBindHost = "localhost"
+HTTPDebugBindAddres = "localhost"
+HTTPDebugPort = 49152
 SourceAPIKey = "..."
 SourceharedSecret = "..."
 CacheHost = "localhost"

@@ -6,6 +6,8 @@ import (
 	"log"
 	"strings"
 
+	"github.com/jesseward/songexplorer/metrics"
+
 	"github.com/campoy/apiai"
 	"github.com/jesseward/songexplorer/config"
 	"github.com/jesseward/songexplorer/internal/caches"
@@ -13,14 +15,16 @@ import (
 )
 
 type App struct {
-	Source sources.Source // remote data source
-	Cache  caches.Cache   // cache store client
-	Config *config.Config // songexplorer configuration data
+	Source  sources.Source   // remote data source
+	Cache   caches.Cache     // cache store client
+	Config  *config.Config   // songexplorer configuration data
+	Metrics *metrics.Metrics // stats for api requests.
 }
 
 // TrackSimilar handles the similar tracks intent. Performs a cache lookup and then falls through to the
 // external source on a cache miss.
 func (a *App) TrackSimilar(ctx context.Context, req *apiai.Request) (*apiai.Response, error) {
+	a.Metrics.Inc("TrackSimilar.Request")
 	artist := req.Param("artist")
 	if artist == "" {
 		return nil, fmt.Errorf("missing artist parameter")
@@ -58,6 +62,7 @@ func (a *App) TrackSimilar(ctx context.Context, req *apiai.Request) (*apiai.Resp
 
 // ArtistSimilar performs a similar artist lookup requested within the artist-recommendation intent.
 func (a *App) ArtistSimilar(ctx context.Context, req *apiai.Request) (*apiai.Response, error) {
+	a.Metrics.Inc("ArtistSimilar.Request")
 
 	artist := req.Param("artist")
 	if artist == "" {
@@ -90,6 +95,7 @@ func (a *App) ArtistSimilar(ctx context.Context, req *apiai.Request) (*apiai.Res
 }
 
 func (a *App) ArtistTopTracks(ctx context.Context, req *apiai.Request) (*apiai.Response, error) {
+	a.Metrics.Inc("ArtistTopTracks.Request")
 	artist := req.Param("artist")
 
 	if artist == "" {
@@ -122,6 +128,7 @@ func (a *App) ArtistTopTracks(ctx context.Context, req *apiai.Request) (*apiai.R
 }
 
 func (a *App) ArtistBio(ctx context.Context, req *apiai.Request) (*apiai.Response, error) {
+	a.Metrics.Inc("ArtistBio.Request")
 	artist := req.Param("artist")
 
 	if artist == "" {
