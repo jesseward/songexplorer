@@ -2,7 +2,7 @@
 
 ![Song Explorer](http://lh3.googleusercontent.com/FOJvQH9QkBAyUsnefWKKY-F4JvSAQQ80FXX0PnJSiIXM9J0BSG0F4pWmBpwzAtmFTLeHL7HroAW_2Q "Song Explorer")
 
-Google Home assistant for music recommendations, built with Go and Redis &amp; Flask. Using Google Home and API.ai
+Google Home assistant for music recommendations, built with Go and Redis. Using Google Home and API.ai
 
 In a nutshell this service consists of the following
 
