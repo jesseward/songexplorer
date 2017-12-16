@@ -1,0 +1,13 @@
+[Unit]
+Description=Songexplorer API
+After=network.target
+
+[Service]
+Type=simple
+User=www-data
+WorkingDirectory=/opt/app/songexplorer
+ExecStart=/opt/app/songexplorer/songexplorer -config /opt/app/songexplorer/config.toml
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
