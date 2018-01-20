@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// BaseStatusResponse represents the metrics server response data structure (json)
 type BaseStatusResponse struct {
 	Obj map[string]int `json:"object"`
 }

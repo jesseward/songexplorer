@@ -8,11 +8,13 @@ import (
 	lfm "github.com/shkh/lastfm-go/lastfm"
 )
 
+// LastFM config container for a LastFM source.
 type LastFM struct {
 	c   *config.Config
 	api *lfm.Api
 }
 
+// GetSimilarTracks retrieves similiar songs based on a seed artist + track name
 func (c *LastFM) GetSimilarTracks(artist, track string) (*sources.CacheableSimilarTracks, error) {
 	songs, err := c.api.Track.GetSimilar(lfm.P{"artist": artist, "track": track, "limit": c.c.MaxTopSimTracks})
 	if err != nil {
@@ -26,6 +28,7 @@ func (c *LastFM) GetSimilarTracks(artist, track string) (*sources.CacheableSimil
 	return &sources.CacheableSimilarTracks{SimilarTracks: st}, nil
 }
 
+// GetSimilarArtists retrieves the top N similar artists based on seeded/user supplied artist
 func (c *LastFM) GetSimilarArtists(artist string) (*sources.CacheableSimilarArtists, error) {
 	artists, err := c.api.Artist.GetSimilar(lfm.P{"artist": artist, "limit": c.c.MaxTopSimArtists})
 	if err != nil {
@@ -38,6 +41,8 @@ func (c *LastFM) GetSimilarArtists(artist string) (*sources.CacheableSimilarArti
 	}
 	return &sources.CacheableSimilarArtists{SimilarArtist: a}, nil
 }
+
+// GetArtistTopTracks fetches top N songs for the requested artist.
 func (c *LastFM) GetArtistTopTracks(artist string) (*sources.CacheableTopTracks, error) {
 	tracks, err := c.api.Artist.GetTopTracks(lfm.P{"artist": artist, "limit": c.c.MaxTopArtistTracks})
 	if err != nil {
