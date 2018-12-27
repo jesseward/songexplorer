@@ -4,7 +4,7 @@ import (
 	"fmt"
 
 	"github.com/jesseward/songexplorer/config"
-	"github.com/jesseward/songexplorer/internal/sources"
+	"github.com/jesseward/songexplorer/sources"
 	lfm "github.com/shkh/lastfm-go/lastfm"
 )
 

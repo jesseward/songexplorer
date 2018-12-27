@@ -13,9 +13,9 @@ import (
 	"github.com/campoy/apiai"
 
 	"github.com/jesseward/songexplorer/app"
+	"github.com/jesseward/songexplorer/caches/redis"
 	"github.com/jesseward/songexplorer/config"
-	"github.com/jesseward/songexplorer/internal/caches/redis"
-	"github.com/jesseward/songexplorer/internal/sources/lastfm"
+	"github.com/jesseward/songexplorer/sources/lastfm"
 	"gopkg.in/natefinch/lumberjack.v2"
 )
 

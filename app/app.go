@@ -9,9 +9,9 @@ import (
 	"github.com/jesseward/songexplorer/metrics"
 
 	"github.com/campoy/apiai"
+	"github.com/jesseward/songexplorer/caches"
 	"github.com/jesseward/songexplorer/config"
-	"github.com/jesseward/songexplorer/internal/caches"
-	"github.com/jesseward/songexplorer/internal/sources"
+	"github.com/jesseward/songexplorer/sources"
 )
 
 type App struct {
