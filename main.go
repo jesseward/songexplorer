@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"sync"
+	"time"
 
 	"github.com/jesseward/songexplorer/metrics"
 
@@ -16,7 +17,7 @@ import (
 	"github.com/jesseward/songexplorer/caches/redis"
 	"github.com/jesseward/songexplorer/config"
 	"github.com/jesseward/songexplorer/sources/lastfm"
-	"gopkg.in/natefinch/lumberjack.v2"
+	lumberjack "gopkg.in/natefinch/lumberjack.v2"
 )
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 		log.Fatalf("unable to create metadata client, %v", err)
 	}
 
-	// create our cache client
+	// create a Redis cache instance
 	cache := redis.New(cfg)
 
 	m, mux := metrics.NewAdminServletMetrics()
@@ -56,24 +57,40 @@ func main() {
 		Metrics: m,
 	}
 
-	h := apiai.NewHandler()
-	h.Register("artist-recommendation", a.ArtistSimilar)
-	h.Register("artist-bio", a.ArtistBio)
-	h.Register("artist-top-tracks", a.ArtistTopTracks)
-	h.Register("song-recomendations", a.TrackSimilar)
-
 	wg := sync.WaitGroup{}
 	wg.Add(1)
+	// launches metrics httpd service
 	go func() {
-		log.Printf("INFO :: main :: starting metrics service on %s:%d", cfg.HTTPDebugBindAddres, cfg.HTTPDebugPort)
-		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.HTTPDebugBindAddres, cfg.HTTPDebugPort), mux))
+		addr := fmt.Sprintf("%s:%d", cfg.HTTPDebugBindAddres, cfg.HTTPDebugPort)
+		log.Printf("INFO :: main :: starting metrics service on %s", addr)
+		srv := http.Server{
+			Addr:         addr,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+			Handler:      mux,
+		}
+		log.Fatal(srv.ListenAndServe())
 		wg.Done()
 	}()
 
 	wg.Add(1)
+	// launches api.ai handler.
 	go func() {
-		log.Printf("INFO :: main :: starting songexplorer service on %s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort)
-		log.Fatal(http.ListenAndServe(fmt.Sprintf("%s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort), h))
+		h := apiai.NewHandler()
+		h.Register("artist-recommendation", a.ArtistSimilar)
+		h.Register("artist-bio", a.ArtistBio)
+		h.Register("artist-top-tracks", a.ArtistTopTracks)
+		h.Register("song-recomendations", a.TrackSimilar)
+
+		addr := fmt.Sprintf("%s:%d", cfg.HTTPBindAddress, cfg.HTTPBindPort)
+		log.Printf("INFO :: main :: starting songexplorer service on %s", addr)
+		srv := http.Server{
+			Addr:         addr,
+			ReadTimeout:  5 * time.Second,
+			WriteTimeout: 10 * time.Second,
+			Handler:      h,
+		}
+		log.Fatal(srv.ListenAndServe())
 		wg.Done()
 	}()
 	wg.Wait()
