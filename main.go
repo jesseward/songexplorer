@@ -12,7 +12,6 @@ import (
 	"github.com/jesseward/songexplorer/metrics"
 
 	"github.com/campoy/apiai"
-
 	"github.com/jesseward/songexplorer/app"
 	"github.com/jesseward/songexplorer/caches/redis"
 	"github.com/jesseward/songexplorer/config"
@@ -22,22 +21,47 @@ import (
 
 func main() {
 
-	cfgFlg := flag.String("config", "/tmp/config.toml", "songexplorer configuration file location")
+	httpBindPort := flag.Uint("port", 64738, "service bind port")
+	httpBindAddress := flag.String("address", "localhost", "sevice bind address")
+	debugBindPort := flag.Uint("debugport", 49152, "debug bind port")
+	debugBindAddress := flag.String("debugaddress", "localhost", "debug bind address")
+	lastFMAPIKey := flag.String("lastfmapikey", "", "Source API key")
+	lastFMSharedSecret := flag.String("lastfmsharedsecret", "", "Shared secret for Source")
+	cacheHost := flag.String("cachehost", "", "address of the cache (redis) server")
+	cachePort := flag.Uint("cacheport", 6379, "redis port")
+	cacheTTL := flag.String("cachettl", "30d", "cache expiration in human readable format")
+	loglocation := flag.String("logfile", "", "log file location. If omitted logs are written to STDOUT")
+	maxArtist := flag.Int("maxartists", 10, "maximum number of artists")
+	maxTracks := flag.Int("maxtracks", 10, "maximum number of tracks")
+	maxArtistTracks := flag.Int("maxartisttracks", 10, "max artists top tracks")
 	flag.Parse()
 	log.SetOutput(os.Stdout)
-	// abort if we're unable to parse configuration data.
-	cfg, err := config.New(*cfgFlg)
-	if err != nil {
-		log.Fatalf("unable to load config file %s, %v", *cfgFlg, err)
+	// note that preference is to log to STDOUT to be caught by container logging.
+	if *loglocation != "" {
+		log.SetOutput(&lumberjack.Logger{
+			Filename:   *loglocation,
+			MaxSize:    5, // megabytes
+			MaxBackups: 3,
+			MaxAge:     28,   //days
+			Compress:   true, // disabled by default
+		})
 	}
 
-	log.SetOutput(&lumberjack.Logger{
-		Filename:   cfg.LogFileLocation,
-		MaxSize:    5, // megabytes
-		MaxBackups: 3,
-		MaxAge:     28,   //days
-		Compress:   true, // disabled by default
-	})
+	cfg := &config.Config{
+		HTTPBindAddress:     *httpBindAddress,
+		HTTPBindPort:        *httpBindPort,
+		HTTPDebugBindAddres: *debugBindAddress,
+		HTTPDebugPort:       *debugBindPort,
+		SourceAPIKey:        *lastFMAPIKey,
+		SourceSharedSecret:  *lastFMSharedSecret,
+		CacheHost:           *cacheHost,
+		CachePort:           *cachePort,
+		LogFileLocation:     *loglocation,
+		MaxTopArtistTracks:  *maxArtistTracks,
+		MaxTopSimArtists:    *maxArtist,
+		MaxTopSimTracks:     *maxTracks,
+	}
+	cfg.SetCacheDuration(*cacheTTL)
 
 	// abort boot if we're unable to create a new source API client
 	src, err := lastfm.New(cfg)

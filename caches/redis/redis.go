@@ -34,10 +34,5 @@ func (c *Redis) Set(k, v string, x time.Duration) (bool, error) {
 // New returns a Redis (Cache interface) object.
 func New(cfg *config.Config) *Redis {
 	r := redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", cfg.CacheHost, cfg.CachePort)})
-	x, err := time.ParseDuration(cfg.CacheTTL)
-
-	if err != nil {
-		x = 0
-	}
-	return &Redis{r, x}
+	return &Redis{r, cfg.CacheTTLDuration}
 }

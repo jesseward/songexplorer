@@ -1,22 +1,18 @@
 package config
 
 import (
-	"fmt"
 	"time"
-
-	"github.com/BurntSushi/toml"
 )
 
 type Config struct {
-	HTTPBindPort        uint16 // port we listen and serve
+	HTTPBindPort        uint   // port we listen and serve
 	HTTPBindAddress     string // IP or hostname to bind to
 	HTTPDebugBindAddres string // Bind address for internal metrics/admin server
-	HTTPDebugPort       uint16 // TCP port for admin/stats service.
+	HTTPDebugPort       uint   // TCP port for admin/stats service.
 	SourceAPIKey        string // LAST.FM api key
 	SourceSharedSecret  string // LAST.fm shared secret
 	CacheHost           string // Cache Host
-	CachePort           uint16 // Cache port
-	CacheTTL            string // default cache expiration in human readable format.
+	CachePort           uint   // Cache port
 	LogFileLocation     string // logfile location
 	MaxTopSimArtists    int
 	MaxTopSimTracks     int
@@ -24,18 +20,11 @@ type Config struct {
 	CacheTTLDuration    time.Duration // used internally after sting->duration conversion
 }
 
-// New returns configuration data read from the target config file
-func New(path string) (*Config, error) {
-	var conf Config
+// SetCacheDuration returns configuration data read from the target config file
+func (c *Config) SetCacheDuration(ttl string) {
 
-	if _, err := toml.DecodeFile(path, &conf); err != nil {
-		return &conf, fmt.Errorf("unable to load config: %v", err)
+	c.CacheTTLDuration = 0
+	if t, err := time.ParseDuration(ttl); err == nil {
+		c.CacheTTLDuration = t
 	}
-
-	// cache duration is 0 if not explicitly set.
-	conf.CacheTTLDuration = 0
-	if t, err := time.ParseDuration(conf.CacheTTL); err == nil {
-		conf.CacheTTLDuration = t
-	}
-	return &conf, nil
 }
