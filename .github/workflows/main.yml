@@ -28,7 +28,7 @@ jobs:
           uses: 'azure/aci-deploy@v1'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
-            dns-name-label: ${{ secrets.RESOURCE_GROUP }}${{ github.run_number }}
+            dns-name-label: ${{ secrets.RESOURCE_GROUP }}
             image: ${{ secrets.REGISTRY_LOGIN_SERVER }}/songexplorer:${{ github.sha }}
             ports: 64738:64738
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
