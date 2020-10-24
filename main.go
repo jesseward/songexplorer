@@ -22,9 +22,9 @@ import (
 func main() {
 
 	httpBindPort := flag.Uint("port", 64738, "service bind port")
-	httpBindAddress := flag.String("address", "localhost", "sevice bind address")
+	httpBindAddress := flag.String("address", "", "sevice bind address")
 	debugBindPort := flag.Uint("debugport", 49152, "debug bind port")
-	debugBindAddress := flag.String("debugaddress", "localhost", "debug bind address")
+	debugBindAddress := flag.String("debugaddress", "", "debug bind address")
 	lastFMAPIKey := flag.String("lastfmapikey", "", "Source API key")
 	lastFMSharedSecret := flag.String("lastfmsharedsecret", "", "Shared secret for Source")
 	cacheHost := flag.String("cachehost", "", "address of the cache (redis) server")
