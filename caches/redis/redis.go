@@ -1,6 +1,7 @@
 package redis
 
 import (
+	"crypto/tls"
 	"fmt"
 	"time"
 
@@ -33,6 +34,8 @@ func (c *Redis) Set(k, v string, x time.Duration) (bool, error) {
 
 // New returns a Redis (Cache interface) object.
 func New(cfg *config.Config) *Redis {
-	r := redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", cfg.CacheHost, cfg.CachePort)})
+	tlsConfig := &tls.Config{MinVersion: tls.VersionTLS12}
+	r := redis.NewClient(&redis.Options{Addr: fmt.Sprintf("%s:%d", cfg.CacheHost, cfg.CachePort),
+		Password: cfg.CacheSecret, TLSConfig: tlsConfig})
 	return &Redis{r, cfg.CacheTTLDuration}
 }

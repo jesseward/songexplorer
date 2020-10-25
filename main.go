@@ -20,20 +20,20 @@ import (
 )
 
 func main() {
-
-	httpBindPort := flag.Uint("port", 64738, "service bind port")
-	httpBindAddress := flag.String("address", "", "sevice bind address")
-	debugBindPort := flag.Uint("debugport", 49152, "debug bind port")
-	debugBindAddress := flag.String("debugaddress", "", "debug bind address")
-	lastFMAPIKey := flag.String("lastfmapikey", "", "Source API key")
-	lastFMSharedSecret := flag.String("lastfmsharedsecret", "", "Shared secret for Source")
-	cacheHost := flag.String("cachehost", "", "address of the cache (redis) server")
-	cachePort := flag.Uint("cacheport", 6379, "redis port")
-	cacheTTL := flag.String("cachettl", "30d", "cache expiration in human readable format")
-	loglocation := flag.String("logfile", "", "log file location. If omitted logs are written to STDOUT")
-	maxArtist := flag.Int("maxartists", 10, "maximum number of artists")
-	maxTracks := flag.Int("maxtracks", 10, "maximum number of tracks")
-	maxArtistTracks := flag.Int("maxartisttracks", 10, "max artists top tracks")
+	httpBindPort := flag.Int("port", config.LookupEnvOrInt("port", 64738), "service bind port")
+	httpBindAddress := flag.String("address", config.LookupEnvOrStr("address", ""), "sevice bind address")
+	debugBindPort := flag.Int("debugport", config.LookupEnvOrInt("debugport", 49152), "debug bind port")
+	debugBindAddress := flag.String("debugaddress", config.LookupEnvOrStr("debugaddress", ""), "debug bind address")
+	lastFMAPIKey := flag.String("lastfmapikey", config.LookupEnvOrStr("lastfmapikey", ""), "Source API key")
+	lastFMSharedSecret := flag.String("lastfmsharedsecret", config.LookupEnvOrStr("lastfmsharedsecret", ""), "Shared secret for Source")
+	cacheHost := flag.String("cachehost", config.LookupEnvOrStr("cachehost", ""), "address of the cache (redis) server")
+	cachePort := flag.Int("cacheport", config.LookupEnvOrInt("cacheport", 6380), "redis port")
+	cacheTTL := flag.String("cachettl", config.LookupEnvOrStr("cachettl", "30d"), "cache expiration in human readable format")
+	cacheSecret := flag.String("cachesecret", config.LookupEnvOrStr("cachesecret", ""), "secret key for cache.")
+	loglocation := flag.String("logfile", config.LookupEnvOrStr("logfile", ""), "log file location. If omitted logs are written to STDOUT")
+	maxArtist := flag.Int("maxartists", config.LookupEnvOrInt("maxartists", 10), "maximum number of artists")
+	maxTracks := flag.Int("maxtracks", config.LookupEnvOrInt("maxtracks", 10), "maximum number of tracks")
+	maxArtistTracks := flag.Int("maxartisttracks", config.LookupEnvOrInt("maxartisttracks", 10), "max artists top tracks")
 	flag.Parse()
 	log.SetOutput(os.Stdout)
 	// note that preference is to log to STDOUT to be caught by container logging.
@@ -56,6 +56,7 @@ func main() {
 		SourceSharedSecret:  *lastFMSharedSecret,
 		CacheHost:           *cacheHost,
 		CachePort:           *cachePort,
+		CacheSecret:         *cacheSecret,
 		LogFileLocation:     *loglocation,
 		MaxTopArtistTracks:  *maxArtistTracks,
 		MaxTopSimArtists:    *maxArtist,
