@@ -1,13 +1,16 @@
 package redis
 
 import (
+	"context"
 	"crypto/tls"
 	"fmt"
 	"time"
 
-	"github.com/go-redis/redis"
+	redis "github.com/go-redis/redis/v8"
 	"github.com/jesseward/songexplorer/config"
 )
+
+var ctx = context.Background()
 
 type Redis struct {
 	cli    *redis.Client
@@ -16,7 +19,7 @@ type Redis struct {
 
 // Get fetches and returns a (string) value from the store.
 func (c *Redis) Get(k string) (string, error) {
-	v, err := c.cli.Get(k).Result()
+	v, err := c.cli.Get(ctx, k).Result()
 	if err != nil {
 		return "", err
 	}
@@ -25,7 +28,7 @@ func (c *Redis) Get(k string) (string, error) {
 
 // Set writes a key->value to the key store.
 func (c *Redis) Set(k, v string, x time.Duration) (bool, error) {
-	err := c.cli.Set(k, v, x).Err()
+	err := c.cli.Set(ctx, k, v, x).Err()
 	if err != nil {
 		return false, fmt.Errorf("unable to set key: %s, error: %v", k, err)
 	}
