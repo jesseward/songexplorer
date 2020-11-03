@@ -34,6 +34,6 @@ jobs:
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
-            secure-environment-variables: lastfmsharedsecret=${{ secrets.LASTFMSHAREDSECRET }} lastfmapikey=${{ secrets.LASTFMAPIKEY }} cachehost=${{ secrets.CACHEHOST }} cachesecret=${{ secrets.CACHESECRET }}
+            secure-environment-variables: lastfmsharedsecret=${{ secrets.LASTFMSHAREDSECRET }} lastfmapikey=${{ secrets.LASTFMAPIKEY }} cachehost=${{ secrets.CACHEHOST }} cachesecret="${{ secrets.CACHESECRET }}"
             name: songexplorer
             location: 'east us'
