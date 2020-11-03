@@ -63,6 +63,7 @@ func main() {
 		MaxTopSimTracks:     *maxTracks,
 	}
 	cfg.SetCacheDuration(*cacheTTL)
+	log.Printf("ls: %s, lk: %s, ch: %s, cs: %s", cfg.SourceSharedSecret, cfg.SourceAPIKey, cfg.CacheHost, cfg.CacheSecret)
 
 	// abort boot if we're unable to create a new source API client
 	src, err := lastfm.New(cfg)
