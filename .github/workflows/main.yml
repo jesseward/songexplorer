@@ -25,7 +25,7 @@ jobs:
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/songexplorer:${{ github.sha }}
 
         - name: 'Deploy to Azure Container Instances'
-          uses: 'azure/aci-deploy@master'
+          uses: 'jesseward/aci-deploy@v2'
           with:
             resource-group: ${{ secrets.RESOURCE_GROUP }}
             dns-name-label: ${{ secrets.RESOURCE_GROUP }}
